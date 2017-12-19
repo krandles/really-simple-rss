@@ -3,7 +3,7 @@ require 'uri'
 require 'open-uri'
 require 'pry'
 
-url = 'https://kotaku.com/rss'
+@@all = []
 
 class RSSFeed
   attr_accessor :url, :title, :articles, :feed
@@ -13,6 +13,7 @@ class RSSFeed
     @feed = get_rss_feed(url)
     @title = feed.channel.title
     @articles = feed.items
+    @@all << self
   end
 
   def get_rss_feed(url)
@@ -31,18 +32,4 @@ class RSSFeed
   def open_article_in_browser(article)
     system "open #{article.link}"
   end
-
-  def create_articles
-
-  end
-end
-
-class RSSArticle
-  attr_accessor
-
-  def initialize
-  
-  end
-
-
 end
