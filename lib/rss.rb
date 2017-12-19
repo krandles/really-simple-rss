@@ -25,6 +25,7 @@ class RSSFeed
     articles.each_with_index do |item, index|
       puts "#{index + 1}. #{item.title}"
     end
+    puts "\n"
   end
 
   def open_article_in_browser(article)
