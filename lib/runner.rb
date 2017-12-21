@@ -2,8 +2,8 @@ require_relative './rss.rb'
 require 'pry'
 
 DEFAULT_FEEDS = ['https://kotaku.com/rss',
-  'http://goodbeerhunting.com/sightlines?format=RSS',
-  'http://feeds.feedburner.com/rockpapershotgun?format=xml']
+                 'http://goodbeerhunting.com/sightlines?format=RSS',
+                 'http://feeds.feedburner.com/rockpapershotgun?format=xml']
 
 
 def runner
@@ -24,6 +24,10 @@ def list_selection(input)
     select_feed_from_input(input)
   elsif input == 'help'
     list_help
+    list_input
+  else
+    puts "Please enter a valid command\n\n"
+    list_input
   end
 end
 
@@ -43,7 +47,7 @@ end
 
 # parses input when selecting a feed
 def list_input
-  puts 'Enter a feed URL or select one of the default feeds (type "list" to see feeds)'
+  puts 'Enter a feed URL or select one of the default feeds by number (type "list" to see feeds)'
   input = gets.chomp
   list_selection(input)
 end
@@ -54,30 +58,54 @@ def articles_input(feed)
   input = gets.chomp
   a_num = input.to_i
   if input.to_i.to_s == input
-    display_article_info(feed.articles[a_num - 1], a_num)
+    display_article_info(feed.articles[a_num - 1], a_num, feed)
   elsif input.start_with? 'open' # "open #"
     feed.open_article_in_browser(feed.articles[input.split[-1].to_i - 1])
+    feed.list_articles
+    articles_input(feed)
   elsif input == 'list'
     list_input
   elsif input == 'help'
-    items_help
+    articles_help
+    articles_input(feed)
+  elsif input == 'exit'
+    puts 'Goodbye!'
+  else
+    puts "Please enter a valid command\n\n"
+    articles_input(feed)
   end
-  puts "do things with articles here"
 end
 
-def display_article_info(article, num)
+def display_article_info(article, num, feed)
   puts "Title: #{article.title}"
   puts "Published Date: #{article.pubDate}"
   puts "Author: #{article.dc_creator}"
   puts "\n"
-  puts "Type \"open #{num}\" to open this article in your browser"
+  puts "Type \"open\" to open this article in your browser or \"a\" to return to the articles list"
+  # binding.pry
+  input = gets.chomp
+  if input == "open"
+    system "open #{article.link}"
+    feed.list_articles
+    articles_input(feed)
+  elsif input == "a"
+    feed.list_articles
+    articles_input(feed)
+  elsif input == "exit"
+    puts "Goodbye!"
+  end
 end
 
 def list_help
-  puts "list command reference goes here"
-  list_input
+  puts "\n"
+  puts "help    displays this menu"
+  puts "exit    exits the program\n\n"
 end
 
-def items_help
-  puts "articles command reference goes here"
+def articles_help
+  puts "\n"
+  puts "help    displays this menu"
+  puts "exit    exits the program"
+  puts "open #  opens the specified article in your browser"
+  puts "feeds   returns to feed selection\n\n"
 end
